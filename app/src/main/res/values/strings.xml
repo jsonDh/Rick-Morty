@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Rick-Morty</string>
+    <string name="app_name">Rick &amp; Morty</string>
+    <string name="characters_list_error">An error occurred while getting the characters list.</string>
 </resources>
