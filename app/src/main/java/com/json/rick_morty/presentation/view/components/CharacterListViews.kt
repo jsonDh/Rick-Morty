@@ -21,7 +21,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -100,13 +99,4 @@ fun CharacterCard(character: CharactersListQuery.Result?) {
             }
         }
     }
-}
-
-@Composable
-@Preview
-fun PreviewItems() {
-    val char: CharactersListQuery.Result = CharactersListQuery.Result(
-        "1", "Rick", "Alive", "Human", "https://rickandmortyapi.com/api/character/avatar/1.jpeg"
-    )
-    CharacterCard(character = char)
 }
