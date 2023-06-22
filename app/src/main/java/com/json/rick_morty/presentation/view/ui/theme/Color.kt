@@ -1,4 +1,4 @@
-package com.json.rick_morty.ui.theme
+package com.json.rick_morty.presentation.view.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val md_theme_light_primary = Color(0xFF006971)

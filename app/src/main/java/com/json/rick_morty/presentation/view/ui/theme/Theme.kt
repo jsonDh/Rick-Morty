@@ -1,4 +1,4 @@
-package com.json.rick_morty.ui.theme
+package com.json.rick_morty.presentation.view.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
