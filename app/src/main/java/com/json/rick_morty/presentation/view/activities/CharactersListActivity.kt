@@ -6,21 +6,16 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.lifecycleScope
-import com.json.rick_morty.R
 import com.json.rick_morty.presentation.view.components.ShowCharactersList
+import com.json.rick_morty.presentation.view.components.SmallAppBar
 import com.json.rick_morty.presentation.view.ui.theme.RickMortyTheme
-import com.json.rick_morty.presentation.viewmodel.CharactersState
+import com.json.rick_morty.presentation.viewmodel.CharactersListState
 import com.json.rick_morty.presentation.viewmodel.CharactersViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -38,8 +33,8 @@ class CharactersListActivity : ComponentActivity() {
             }
         }
         lifecycleScope.launch {
-            charactersViewModel.charactersState.collect { charactersState ->
-                if (charactersState is CharactersState.Initial) {
+            charactersViewModel.charactersListState.collect { charactersState ->
+                if (charactersState is CharactersListState.Initial) {
                     charactersViewModel.getCharacters()
                 }
             }
@@ -49,18 +44,10 @@ class CharactersListActivity : ComponentActivity() {
 
 @Composable
 fun CharacterListScreen(charactersViewModel: CharactersViewModel) {
-    val charactersState by charactersViewModel.charactersState.collectAsState()
+    val charactersState by charactersViewModel.charactersListState.collectAsState()
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(stringResource(id = R.string.app_name))
-                },
-                colors = TopAppBarDefaults.smallTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            )
+            SmallAppBar()
         },
         content = { padding ->
             Box(modifier = Modifier.padding(padding)) {
