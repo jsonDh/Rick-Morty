@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 
 class CharacterDetailsFragment : Fragment() {
 
-    private val characterDetailViewModel: CharacterViewModel by viewModels()
+    private val detailsViewModel: CharacterViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,17 +38,17 @@ class CharacterDetailsFragment : Fragment() {
     ): View {
         val characterId = requireArguments().getString("characterId") ?: ""
         lifecycleScope.launch {
-            characterDetailViewModel.characterState.collect { characterState ->
+            detailsViewModel.characterState.collect { characterState ->
                 if (characterState is CharacterState.Initial) {
-                    characterDetailViewModel.characterId.value = characterId
-                    characterDetailViewModel.getCharacterDetails()
+                    detailsViewModel.characterId.value = characterId
+                    detailsViewModel.getCharacterDetails()
                 }
             }
         }
 
         return ComposeView(requireContext()).apply {
             setContent {
-                CharacterDetailScreen(characterDetailViewModel)
+                CharacterDetailScreen(detailsViewModel)
             }
         }
     }
