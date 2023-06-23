@@ -27,14 +27,14 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.json.rick_morty.CharactersListQuery
 import com.json.rick_morty.R
-import com.json.rick_morty.presentation.viewmodel.CharactersState
+import com.json.rick_morty.presentation.viewmodel.CharactersListState
 
 
 @Composable
-fun ShowCharactersList(charactersState: CharactersState?) {
-    when (charactersState) {
-        is CharactersState.Success -> {
-            val characters = charactersState.data?.filterNotNull() ?: emptyList()
+fun ShowCharactersList(charactersListState: CharactersListState?) {
+    when (charactersListState) {
+        is CharactersListState.Success -> {
+            val characters = charactersListState.data?.filterNotNull() ?: emptyList()
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2)
             ) {
@@ -43,8 +43,8 @@ fun ShowCharactersList(charactersState: CharactersState?) {
                 }
             }
         }
-        is CharactersState.Loading -> ShowLoading()
-        is CharactersState.Error -> ShowError(stringResource(id = R.string.characters_list_error))
+        is CharactersListState.Loading -> ShowLoading()
+        is CharactersListState.Error -> ShowError(stringResource(id = R.string.characters_list_error))
         else -> {}
     }
 }
