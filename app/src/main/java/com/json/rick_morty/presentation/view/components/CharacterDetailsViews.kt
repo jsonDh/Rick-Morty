@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,8 +45,8 @@ fun CharacterDetailStates(characterState: CharacterState) {
                 ShowCharacterDetails(character = character)
         }
 
-        is CharacterState.Loading -> {}
-        is CharacterState.Error -> {}
+        is CharacterState.Loading -> ShowLoading()
+        is CharacterState.Error -> ShowError(message = stringResource(id = R.string.characters_details_error))
         else -> {}
     }
 }
