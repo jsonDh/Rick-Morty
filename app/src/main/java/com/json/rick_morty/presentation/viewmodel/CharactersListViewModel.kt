@@ -19,7 +19,6 @@ import javax.inject.Inject
 class CharactersViewModel @Inject constructor(private val repository: CharacterRepository) :
     ViewModel() {
 
-    private var job: Job? = null
     private val _charactersListState = MutableStateFlow<CharactersListState>(CharactersListState.Initial)
     val charactersListState: StateFlow<CharactersListState> = _charactersListState
 
@@ -30,7 +29,7 @@ class CharactersViewModel @Inject constructor(private val repository: CharacterR
     private fun getCharactersList() {
         Log.d(TAG, "Getting characters list...")
         _charactersListState.value = CharactersListState.Loading
-        job = viewModelScope.launch {
+        viewModelScope.launch {
             try {
                 val response = repository.getCharacterList()
                 withContext(Dispatchers.Main) {
