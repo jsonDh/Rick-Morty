@@ -15,6 +15,4 @@ Technologies used:
 - SOLID
 - Coil
 
-The APK file will be on the release/release-1.0.0 branch inside the project folder
-
 by jsonDh
