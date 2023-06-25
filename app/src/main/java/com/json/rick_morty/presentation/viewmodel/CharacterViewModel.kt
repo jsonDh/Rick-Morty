@@ -8,6 +8,7 @@ import com.json.rick_morty.CharacterQuery
 import com.json.rick_morty.domain.repository.CharacterRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -39,6 +40,7 @@ class CharacterViewModel @Inject constructor(private val repository: CharacterRe
         _characterState.value = CharacterState.Loading
         viewModelScope.launch {
             try {
+                delay(500) // Just a small delay to provide better user experience between the empty views and the actual data
                 val response = repository.getCharacterDetails(characterId)
                 withContext(Dispatchers.Main) {
                     _characterState.value = CharacterState.Success(response.data)
