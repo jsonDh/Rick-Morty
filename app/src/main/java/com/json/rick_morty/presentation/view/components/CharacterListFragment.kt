@@ -70,6 +70,7 @@ fun CharacterListFragment(charactersViewModel: CharactersViewModel, navControlle
 @Composable
 fun ShowCharactersList(charactersListState: CharactersListState?, navController: NavController) {
     when (charactersListState) {
+        is CharactersListState.Initial -> EmptyList()
         is CharactersListState.Success -> {
             val characters = charactersListState.data?.filterNotNull() ?: emptyList()
             if (characters.isEmpty()) {
