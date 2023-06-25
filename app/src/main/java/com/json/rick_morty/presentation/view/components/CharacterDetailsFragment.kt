@@ -1,6 +1,6 @@
 package com.json.rick_morty.presentation.view.components
 
-import android.util.Log
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,9 +32,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -63,45 +70,74 @@ fun CharacterDetailFragment(
             characterViewModel.listen()
         }
     }
+
+    //Handle back press
+    val goBack = {
+        navController.popBackStack()
+        characterViewModel.clearData()
+    }
+    BackPressHandler(onBackPressed = goBack)
+    //Handle screen rotation
     val charactersState by characterViewModel.characterState.collectAsState()
+    var orientation by remember { mutableStateOf(Configuration.ORIENTATION_PORTRAIT) }
+    val configuration = LocalConfiguration.current
+    LaunchedEffect(configuration) {
+        snapshotFlow { configuration.orientation }
+            .collect { orientation = it }
+    }
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {},
-                navigationIcon = {
-                    IconButton(onClick = {
-                        navController.popBackStack()
-                        characterViewModel.clearData()
-                    }) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Back Button"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.smallTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+            if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                TopAppBar(
+                    title = {},
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            navController.popBackStack()
+                            characterViewModel.clearData()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = "Back Button"
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.smallTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                    )
                 )
-            )
+            }
         },
         content = { padding ->
             Box(modifier = Modifier.padding(padding)) {
-                CharacterDetailStates(charactersState)
+                CharacterDetailStates(orientation, charactersState)
             }
         }
     )
 }
 
 @Composable
-fun CharacterDetailStates(characterState: CharacterState) {
+fun CharacterDetailStates(orientation: Int, characterState: CharacterState) {
     when (characterState) {
         is CharacterState.Success -> {
             val character = characterState.data?.character
             if (character != null)
-                ShowCharacterDetails(character = character)
+                if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    ShowCharacterDetailsLandscape(character = character)
+                } else {
+                    ShowCharacterDetails(character = character)
+                }
         }
-        is CharacterState.Loading -> ShowLoading()
+
+        is CharacterState.Loading -> {
+            ShowLoading()
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                EmptyViewLandscape()
+            } else {
+                EmptyView()
+            }
+        }
+
         is CharacterState.Error -> ShowError(message = stringResource(id = R.string.characters_details_error))
         else -> {}
     }
@@ -156,6 +192,183 @@ fun ShowCharacterDetails(character: CharacterQuery.Character) {
             )
         }
         Column {
+            val date = character.created.toString().convertDateStringToReadable().toString()
+            DetailData(
+                image = R.drawable.heart,
+                property = "Status",
+                detail = character.status.toString()
+            )
+            DetailData(
+                image = R.drawable.gender,
+                property = "Gender",
+                detail = character.gender.toString()
+            )
+            DetailData(image = R.drawable.date, property = "Created", detail = date)
+        }
+    }
+}
+
+@Composable
+fun EmptyView() {
+    Column {
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.primary),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(280.dp)
+                    .padding(86.dp, 26.dp)
+                    .clip(CircleShape)
+                    .border(2.dp, MaterialTheme.colorScheme.onPrimary, CircleShape)
+                    .alpha(0.5f),
+                shape = CircleShape,
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 8.dp
+                )
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.rick_ic),
+                    contentDescription = "Default Image",
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(55.dp)
+            )
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "Details from your character are loading, they will show up soon...",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp, 150.dp)
+                    .alpha(0.5f),
+                textAlign = TextAlign.Center,
+                fontSize = 22.sp,
+                color = MaterialTheme.colorScheme.onTertiaryContainer
+            )
+        }
+    }
+}
+
+@Composable
+fun EmptyViewLandscape() {
+    Row {
+        Column(
+            modifier = Modifier
+                .weight(0.5f)
+                .background(MaterialTheme.colorScheme.primary),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Column(verticalArrangement = Arrangement.Center) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .padding(120.dp, 220.dp)
+                        .clip(CircleShape)
+                        .border(2.dp, MaterialTheme.colorScheme.onPrimary, CircleShape)
+                        .alpha(0.5f),
+                    shape = CircleShape,
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 8.dp
+                    )
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.rick_ic),
+                        contentDescription = "Default Image",
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+        }
+        Column(
+            modifier = Modifier.weight(0.5f),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Details from your character are loading, they will show up soon...",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp, 250.dp)
+                    .alpha(0.5f),
+                textAlign = TextAlign.Center,
+                fontSize = 22.sp,
+                color = MaterialTheme.colorScheme.onTertiaryContainer
+            )
+        }
+    }
+}
+
+@Composable
+fun ShowCharacterDetailsLandscape(character: CharacterQuery.Character) {
+    Row {
+        Column(
+            modifier = Modifier
+                .weight(0.5f)
+                .background(MaterialTheme.colorScheme.primary),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Column(
+                modifier = Modifier.weight(0.5f),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(320.dp)
+                        .padding(120.dp, 26.dp)
+                        .clip(CircleShape)
+                        .border(2.dp, MaterialTheme.colorScheme.onPrimary, CircleShape),
+                    shape = CircleShape,
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 8.dp
+                    )
+                ) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(character.image)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = character.name,
+                        placeholder = painterResource(id = R.drawable.rick_ic),
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+            Column(
+                modifier = Modifier.weight(0.5f),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = character.name.toString(),
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+                Text(
+                    text = character.species.toString(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(0.dp, 0.dp, 0.dp, 12.dp),
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f)
+                )
+            }
+        }
+        Column(
+            modifier = Modifier
+                .weight(0.5f)
+                .background(MaterialTheme.colorScheme.onBackground)
+        ) {
             val date = character.created.toString().convertDateStringToReadable().toString()
             DetailData(
                 image = R.drawable.heart,

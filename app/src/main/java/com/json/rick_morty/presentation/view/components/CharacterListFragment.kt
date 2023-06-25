@@ -40,6 +40,8 @@ import com.json.rick_morty.CharactersListQuery
 import com.json.rick_morty.R
 import com.json.rick_morty.presentation.view.Screens
 import com.json.rick_morty.presentation.view.ui.theme.RickMortyTheme
+import com.json.rick_morty.presentation.viewmodel.CharacterState
+import com.json.rick_morty.presentation.viewmodel.CharacterViewModel
 import com.json.rick_morty.presentation.viewmodel.CharactersListState
 import com.json.rick_morty.presentation.viewmodel.CharactersViewModel
 
@@ -83,38 +85,17 @@ fun ShowCharactersList(charactersListState: CharactersListState?, navController:
                 }
             }
         }
-        is CharactersListState.Loading -> ShowLoading()
+
+        is CharactersListState.Loading -> {
+            ShowLoading()
+            EmptyList()
+        }
+
         is CharactersListState.Error -> ShowError(stringResource(id = R.string.characters_list_error))
         else -> {}
     }
 }
 
-
-@Composable
-fun EmptyList() {
-    RickMortyTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .alpha(0.5f), verticalArrangement = Arrangement.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.rick_ic),
-                contentDescription = "Empty Image View",
-                modifier = Modifier.fillMaxWidth()
-            )
-            Text(
-                text = "There is no character list at the moment but surely some will come up soon.",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp, 50.dp),
-                textAlign = TextAlign.Center,
-                fontSize = 22.sp,
-                color = MaterialTheme.colorScheme.onTertiaryContainer
-            )
-        }
-    }
-}
 
 @Composable
 fun CharacterCard(character: CharactersListQuery.Result?, navController: NavController) {
@@ -167,6 +148,32 @@ fun CharacterCard(character: CharactersListQuery.Result?, navController: NavCont
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun EmptyList() {
+    RickMortyTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .alpha(0.5f), verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.rick_ic),
+                contentDescription = "Empty Image View",
+                modifier = Modifier.fillMaxWidth()
+            )
+            Text(
+                text = "There is no character list at the moment but surely some will come up soon.",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp, 50.dp),
+                textAlign = TextAlign.Center,
+                fontSize = 22.sp,
+                color = MaterialTheme.colorScheme.onTertiaryContainer
+            )
         }
     }
 }
